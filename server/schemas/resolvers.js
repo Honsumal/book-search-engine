@@ -1,14 +1,16 @@
 const { User } = require('../models');
+const { AuthenticationError } = require('apollo-server-express');
+const { signToken } = require('../utils/auth');
 
 const resolvers = {
     Query: {
-        getSingleUser: async ({ user = null, params }, res) => {
+        getSingleUser: async (parent, { user = null, params }) => {
             const foundUser = await User.findOne({
               $or: [{ _id: user ? user._id : params.id }, { username: params.username }],
             });
         
             if (!foundUser) {
-              return res.status(400).json({ message: 'Cannot find a user with this id!' });
+              throw new AuthenticationError('Cannot find a user with this id!');
             }
         
             res.json(foundUser);
