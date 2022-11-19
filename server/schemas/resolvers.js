@@ -3,70 +3,71 @@ const { AuthenticationError } = require('apollo-server-express');
 const { signToken } = require('../utils/auth');
 
 const resolvers = {
-    Query: {
-        getSingleUser: async (parent, { user = null, params }) => {
-            const foundUser = await User.findOne({
-              $or: [{ _id: user ? user._id : params.id }, { username: params.username }],
-            });
-        
-            if (!foundUser) {
-              throw new AuthenticationError('Cannot find a user with this id!');
-            }
-        
-            res.json(foundUser);
-        },
+  Query: {
+    getSingleUser: async (parent, { user = null, params }) => {
+      const foundUser = await User.findOne({
+        $or: [{ _id: user ? user._id : params.id }, { username: params.username }],
+      });
+  
+      if (!foundUser) {
+        throw new AuthenticationError('Cannot find a user with this id!');
+      }
+  
+      return foundUser;
     },
-    Mutation: {
-        createUser: async ({ body }, res) => {
-            const user = await User.create(body);
+  },
+  Mutation: {
+    createUser: async (parent, { body }) => {
+        const user = await User.create(body);
         
-            if (!user) {
-              return res.status(400).json({ message: 'Something is wrong!' });
-            }
-            const token = signToken(user);
-            res.json({ token, user });
-        },
+        if (!user) {
+          throw new AuthenticationError('Something is wrong!')
+        }
 
-        login: async({ body }, res) => {
-            const user = await User.findOne({ $or: [{ username: body.username }, { email: body.email }] });
-            if (!user) {
-              return res.status(400).json({ message: "Can't find this user" });
-            }
-        
-            const correctPw = await user.isCorrectPassword(body.password);
-        
-            if (!correctPw) {
-              return res.status(400).json({ message: 'Wrong password!' });
-            }
-            const token = signToken(user);
-            res.json({ token, user });
-        },
-        
-        saveBook: async ({ user, body }, res) => {
-            console.log(user);
-            try {
-              const updatedUser = await User.findOneAndUpdate(
-                { _id: user._id },
-                { $addToSet: { savedBooks: body } },
-                { new: true, runValidators: true }
-              );
-              return res.json(updatedUser);
-            } catch (err) {
-              console.log(err);
-              return res.status(400).json(err);
-            }
-        },
+        const token = signToken(user)
+    
+        return { token, user };
+    },
 
-        deleteBook: async({ user, params }, res) => {
-            const updatedUser = await User.findOneAndUpdate(
-              { _id: user._id },
-              { $pull: { savedBooks: { bookId: params.bookId } } },
-              { new: true }
-            );
-            if (!updatedUser) {
-              return res.status(404).json({ message: "Couldn't find user with this id!" });
-            }
-            return res.json(updatedUser);
-        },
-    }
+    login: async (parent, { body }) => {
+        const user = await User.findOne({ $or: [{ username: body.username }, { email: body.email }] });
+        if (!user) {
+          throw new AuthenticationError("Can't find this user");
+        }
+    
+        const correctPw = await user.isCorrectPassword(body.password);
+    
+        if (!correctPw) {
+          throw new AuthenticationError('Wrong password!');
+        }
+        const token = signToken(user);
+        return { token, user };
+    },
+    
+    saveBook: async (parent, { body }, context) => {
+      if (context.user){
+        return User.findOneAndUpdate(
+            { _id: context.user._id },
+            { $addToSet: { savedBooks: body } },
+            { new: true, runValidators: true }
+          );
+      }
+
+      throw new AuthenticationError('You need to be logged in!');
+    },
+
+    deleteBook: async (parent, { params }, context) => {
+      if (context.user) {
+        return User.findOneAndUpdate(
+        { _id: context.user._id },
+        { $pull: { savedBooks: { bookId: params.bookId } } },
+        { new: true }
+        );
+      }
+
+      throw new AuthenticationError("Couldn't find user with this id!")
+    },
+  }
 }
+
+module.exports = resolvers
