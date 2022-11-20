@@ -44,7 +44,7 @@ function App() {
             />
             <Route 
               path='*'
-              element={<h1 className='display-2'>Wrong page!</h1>}  //change later
+              element={<h1 className='display-2'>Wrong page!</h1>}
             />
           </Routes>
         </>

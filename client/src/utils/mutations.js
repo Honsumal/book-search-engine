@@ -30,10 +30,10 @@ mutation Mutation($newBook: iBook!) {
     email
     _id
     savedBooks {
-      title
       bookId
       authors
       description
+      title
       image
       link
     }
