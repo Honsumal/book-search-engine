@@ -9,7 +9,7 @@ import Auth from '../utils/auth';
 
 const LoginForm = () => {
   const [userFormData, setUserFormData] = useState({ email: '', password: '' });
-  const [login, {error, data }] = useMutation(LOGIN_USER)
+  const [login, {error}] = useMutation(LOGIN_USER)
   const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
 
@@ -30,7 +30,7 @@ const LoginForm = () => {
 
     try {
       const { data } = await login({
-        variables: { ...formState },
+        variables: { ...userFormData },
       });
 
       Auth.login(data.login.token);
@@ -38,7 +38,6 @@ const LoginForm = () => {
       console.error(e);
     }
     setUserFormData({
-      username: '',
       email: '',
       password: '',
     });
@@ -47,9 +46,9 @@ const LoginForm = () => {
   return (
     <>
       <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
-        {/* <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant='danger'>
+        <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant='danger'>
           Something went wrong with your login credentials!
-        </Alert> */}
+        </Alert>
         <Form.Group>
           <Form.Label htmlFor='email'>Email</Form.Label>
           <Form.Control
