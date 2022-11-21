@@ -1,1 +1,4 @@
-#BIG BANG KAMEHAMEHA
+#BIG BANG 
+
+
+o/ readme
