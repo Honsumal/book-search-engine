@@ -17,11 +17,11 @@
     "react-router-dom": "^6.2.1",
     "react-scripts": "^4.0.2"
   },
-  "enginers": {
+  "engine": {
     "node": "v16.17.1"
   },
   "scripts": {
-    "start": "react-scripts --openssl-legacy-provider start",
+    "start": "react-scripts",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
