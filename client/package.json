@@ -17,7 +17,7 @@
     "react-router-dom": "^6.2.1",
     "react-scripts": "^4.0.2"
   },
-  "engine": {
+  "engines": {
     "node": "v16.17.1"
   },
   "scripts": {
