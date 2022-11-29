@@ -28,13 +28,13 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
 
-// mongoose.connect(
-//   process.env.MONGODB_URI || 'mongodb://localhost:27017/booksearch_db',
-//   {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//   },
-// );
+mongoose.connect(
+  process.env.MONGODB_URI || 'mongodb://localhost:27017/booksearch_db',
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  },
+);
 
 // Create a new instance of an Apollo server with the GraphQL schema
 const startApolloServer = async (typeDefs, resolvers) => {
